@@ -47,6 +47,15 @@ const blogPosts = [
 ];
 
 // ? get all comments
-router.get('/', async (req, res) => {
+router.get('/', async (rec, res) => {
   res.render('all', { blogPosts });
 });
+
+// get one comment
+router.get('/', async (rec, res) => {
+  res.render('one', { blogPosts }) 
+});
+
+// create a comment
+router. 
+
