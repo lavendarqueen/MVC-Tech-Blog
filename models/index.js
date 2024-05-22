@@ -1,6 +1,6 @@
 const User = require("./User");
 const Comment = require("./Comment");
-const Blogs = require("./Blogs");
+const Blog = require("./Blog");
 // Creates a relationship between User and Project model, with the User having a "has many" relationship with Project model.
 User.hasMany(Comment, {
   foreignKey: "user_id",
@@ -12,7 +12,7 @@ Comment.belongsTo(User, {
   foreignKey: "user_id",
 });
 
-User.hasMany(Blogs, {
+User.hasMany(Blog, {
   foreignKey: "user_id",
   onDelete: "CASCADE",
 });

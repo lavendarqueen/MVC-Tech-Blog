@@ -1,63 +1,64 @@
 const router = require("express").Router();
-// Import the User model from the models folder
-const { User } = require("../../models");
+const { User, Blog, Comment } = require("../../models");
 
-// If a POST request is made to /api/users, a new user is created. The user id and logged in state is saved to the session within the request object.
+//http://localhost:3001/api/user/:id
+router.get("/", async (req, res) => {
+  try {
+    const userBlogData = await User.findByPk(req.params.id, {
+      include: [{ model: Blog }, { model: Comment }],
+    });
+
+    if (!userBlogData) {
+      res.status(404).json({ message: "No user found with that id!" });
+      return;
+    }
+
+    const blogs = userBlogData.map((blog) => blog.get({ plain: true }));
+
+    res.render("dashboard", { blogs, loggedIn: req.session.loggedIn });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+//http://localhost:3001/api/user
+router.post("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
-    const userData = await User.create(req.body);
-
-    req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.logged_in = true;
-
-      res.status(200).json(userData);
+    const userData = await User.create({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password,
     });
+    res.status(200).json(userData);
   } catch (err) {
-    res.status(400).json(err);
+    res.status(500).json(err);
   }
 });
 
-// If a POST request is made to /api/users/login, the function checks to see if the user information matches the information in the database and logs the user in. If correct, the user ID and logged-in state are saved to the session within the request object.
-router.post("/login", async (req, res) => {
+//http://localhost:3001/api/user/:id
+router.put("/", async (req, res) => {
   try {
-    const userData = await User.findOne({ where: { email: req.body.email } });
-
+    const userData = await User.update(
+      {
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+      },
+      {
+        where: {
+          id: req.params.id,
+        },
+        individualHooks: true,
+      }
+    );
     if (!userData) {
-      res
-        .status(400)
-        .json({ message: "Incorrect email or password, please try again" });
+      res.status(404).json({ message: "No user found with that id! " });
       return;
     }
-
-    const validPassword = await userData.checkPassword(req.body.password);
-
-    if (!validPassword) {
-      res
-        .status(400)
-        .json({ message: "Incorrect email or password, please try again" });
-      return;
-    }
-
-    req.session.save(() => {
-      req.session.user_id = userData.id;
-      req.session.logged_in = true;
-
-      res.json({ user: userData, message: "You are now logged in!" });
-    });
+    res.status(200).json(err);
   } catch (err) {
-    res.status(400).json(err);
-  }
-});
-
-// If a POST request is made to /api/users/logout, the function checks the logged_in state in the request.session object and destroys that session if logged_in is true.
-router.post("/logout", (req, res) => {
-  if (req.session.logged_in) {
-    req.session.destroy(() => {
-      res.status(204).end();
-    });
-  } else {
-    res.status(404).end();
+    res.status(500).json(err);
   }
 });
 
