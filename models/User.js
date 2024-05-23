@@ -38,7 +38,7 @@ User.init(
     },
   },
   {
-    // Hooks are used so that if a user is created or updated, the password is encrypted before being stored in the database.
+    // Hooks are used to encrypt the user's password before it is stored in the database.
     hooks: {
       beforeCreate: async (newUserData) => {
         newUserData.password = await bcrypt.hash(newUserData.password, 10);
