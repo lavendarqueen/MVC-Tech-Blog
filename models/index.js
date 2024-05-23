@@ -17,11 +17,11 @@ User.hasMany(Blog, {
   onDelete: "CASCADE",
 });
 
-Blogs.belongsTo(User, {
+Blog.belongsTo(User, {
   foreignKey: "user_id",
 });
 
-Blogs.hasMany(Comment, { foreignKey: "blog_id" });
-Comment.belongsTo(Blogs);
+Blog.hasMany(Comment, { foreignKey: "blog_id" });
+Comment.belongsTo(Blog);
 
-module.exports = { User, Comment, Blogs };
+module.exports = { User, Comment, Blog };
